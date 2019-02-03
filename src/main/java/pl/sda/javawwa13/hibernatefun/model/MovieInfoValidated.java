@@ -4,8 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
+import pl.sda.javawwa13.hibernatefun.annotation.AfterDVDPremiere;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -15,13 +20,18 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-public class MovieInfo {
+@AfterDVDPremiere
+public class MovieInfoValidated {
 
     @Id
     @GeneratedValue
     private Long id;
 
+    @NotNull
     private String title;
+
+    @Min(0)
+    @Max(10)
     private Double avgScore;
 
     @OneToMany(mappedBy = "movieInfo", orphanRemoval = true, cascade = {CascadeType.PERSIST})
@@ -34,6 +44,10 @@ public class MovieInfo {
 
     @Transient
     private Long daysSinceRelease;
+
+    @Length(min = 100)  //wielkosc kolumny w tabeli na bazie nadal 255!
+    //@Column(length = 2000)
+    private String description;
 
     @PostLoad
     public void calculateDaysSinceRelease() {
